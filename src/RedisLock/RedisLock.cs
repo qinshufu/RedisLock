@@ -86,9 +86,7 @@ public class RedisLock : IDisposable
 
     public async Task AquireAsync(TimeSpan? timeout = null)
     {
-        if (timeout is null)
-            timeout = DefaultAquireTimeout;
-
+        timeout ??= DefaultAquireTimeout;
         var stopWatch = Stopwatch.StartNew();
         var success = await _database.StringSetAsync(_key, _identity, _timeout, When.NotExists);
         while (success is false)
@@ -99,7 +97,7 @@ public class RedisLock : IDisposable
                 throw new AquireRedisLockTimeOutException(this);
             }
 
-            await Task.Delay(Random.Shared.Next(50, 500));
+            await Task.Delay(Random.Shared.Next(10, 50));
             success = await _database.StringSetAsync(_key, _identity, _timeout, When.NotExists);
         }
 

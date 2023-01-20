@@ -5,15 +5,8 @@ namespace RedisLock
     [Serializable]
     internal class AquireRedisLockTimeOutException : Exception
     {
-        private RedisLock redisLock;
-
-        public AquireRedisLockTimeOutException()
-        {
-        }
-
         public AquireRedisLockTimeOutException(RedisLock redisLock) : base(redisLock.ToString())
         {
-            this.redisLock = redisLock;
         }
 
         public AquireRedisLockTimeOutException(string? message) : base(message)

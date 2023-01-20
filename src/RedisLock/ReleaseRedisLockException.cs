@@ -5,15 +5,9 @@ namespace RedisLock
     [Serializable]
     internal class ReleaseRedisLockException : Exception
     {
-        private RedisLock redisLock;
-
-        public ReleaseRedisLockException()
-        {
-        }
 
         public ReleaseRedisLockException(RedisLock redisLock) : base(redisLock.ToString())
         {
-            this.redisLock = redisLock;
         }
 
         public ReleaseRedisLockException(string? message) : base(message)

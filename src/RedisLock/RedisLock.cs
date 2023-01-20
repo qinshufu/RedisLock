@@ -37,15 +37,8 @@ public class RedisLock : IDisposable
     /// </summary>
     /// <param name="connection"></param>
     /// <param name="key"></param>
-    public RedisLock(ConnectionMultiplexer connection, string key)
-    {
-        _database = connection.GetDatabase(0);
-        _key = key;
-        _identity = Guid.NewGuid().ToString();
-        _timeout = TimeSpan.FromSeconds(30);
-
-        AquireAsync().Wait();
-    }
+    public RedisLock(ConnectionMultiplexer connection, string key) : this(connection, 0, key, DefaultLockTimeout)
+    {}
 
     /// <summary>
     /// 创建分布式锁，但是没有获取

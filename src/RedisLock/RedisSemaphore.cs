@@ -46,7 +46,7 @@ public class RedisSemaphore
         }
     }
 
-    public async Task Release()
+    public async Task ReleaseAsync()
     {
         var success = await _database.SortedSetRemoveAsync(_key, _identity);
         if (success is false)

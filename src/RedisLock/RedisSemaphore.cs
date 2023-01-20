@@ -30,9 +30,10 @@ public class RedisSemaphore
     public async Task AquireAsync(TimeSpan? timeout = null)
     {
         timeout ??= DefaultAquireTimeout;
-        var score = (DateTime.UtcNow - UnixTimestampStart).TotalMilliseconds;
+        var score = GetUtcTimestamp();
+        var scoreOfTimeout = score - _timeout.TotalMilliseconds;
         var stopWatch = Stopwatch.StartNew();
-        var success = await DoAquireAsync(score);
+        var success = await DoAquireAsync(score, scoreOfTimeout);
         while (success is false)
         {
             await Task.Delay(Random.Shared.Next(10, 50));
@@ -42,9 +43,11 @@ public class RedisSemaphore
                 throw new AquireRedisLockTimeOutException(this);
             }
 
-            success = await DoAquireAsync(score);
+            success = await DoAquireAsync(score, scoreOfTimeout);
         }
     }
+
+    private static double GetUtcTimestamp() => (DateTime.UtcNow - UnixTimestampStart).TotalMilliseconds;
 
     public async Task ReleaseAsync()
     {
@@ -53,13 +56,12 @@ public class RedisSemaphore
             throw new ReleaseRedisLockException(this);
     }
 
-    private async Task<bool> DoAquireAsync(double score)
+    private async Task<bool> DoAquireAsync(double score, double scoreOfTimeout)
     {
-        var timeoutScore = score - _timeout.TotalMilliseconds;
         var tran = _database.CreateTransaction();
         #pragma warning disable CS4014
         tran.SortedSetAddAsync(_key, _identity, score);
-        tran.SortedSetRemoveRangeByScoreAsync(_key, 0, timeoutScore, Exclude.None); // 删除超时的
+        tran.SortedSetRemoveRangeByScoreAsync(_key, 0, scoreOfTimeout, Exclude.None); // 删除超时的
         tran.SortedSetRemoveRangeByRankAsync(_key, 0, -1-_size); // 清理无效的
         #pragma warning restore CS4014
         var existingTask = tran.SortedSetScoreAsync(_key, _identity);

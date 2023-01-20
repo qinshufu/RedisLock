@@ -14,6 +14,10 @@ namespace RedisLock
         {
         }
 
+        public ReleaseRedisLockException(RedisSemaphore redisSemaphore) : base(redisSemaphore.ToString())
+        {
+        }
+
         public ReleaseRedisLockException(string? message, Exception? innerException) : base(message, innerException)
         {
         }

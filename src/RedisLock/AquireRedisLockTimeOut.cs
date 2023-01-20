@@ -5,11 +5,16 @@ namespace RedisLock
     [Serializable]
     internal class AquireRedisLockTimeOutException : Exception
     {
+
         public AquireRedisLockTimeOutException(RedisLock redisLock) : base(redisLock.ToString())
         {
         }
 
         public AquireRedisLockTimeOutException(string? message) : base(message)
+        {
+        }
+
+        public AquireRedisLockTimeOutException(RedisSemaphore redisSemaphore) : base(redisSemaphore.ToString())
         {
         }
 

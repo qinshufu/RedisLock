@@ -5,7 +5,8 @@ namespace RedisLock;
 
 public class RedisSemaphore
 {
-    private static readonly TimeSpan DefaultAquireTimeout = TimeSpan.FromSeconds(30);
+    private static readonly TimeSpan DefaultAquireTimeout = TimeSpan.FromSeconds(2);
+    private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(10);
     private static readonly DateTime UnixTimestampStart = new DateTime(1970, 1, 1);
 
     private readonly IDatabase _database;
@@ -13,6 +14,9 @@ public class RedisSemaphore
     private readonly TimeSpan _timeout;
     private readonly string _identity;
     private readonly int _size;
+
+    public RedisSemaphore(ConnectionMultiplexer connection, string key, int size) : this(connection, 0, key, size, DefaultTimeout)
+    {}
 
     public RedisSemaphore(ConnectionMultiplexer connection, int database, string key, int size, TimeSpan timeout)
     {

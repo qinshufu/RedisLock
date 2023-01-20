@@ -23,7 +23,7 @@ namespace RedisLock;
 /// <example>
 public class RedisLock : IDisposable
 {
-    public static readonly TimeSpan DefaultAquireTimeout = TimeSpan.FromSeconds(10);
+    public static readonly TimeSpan DefaultAquireTimeout = TimeSpan.FromSeconds(2);
     public static readonly TimeSpan DefaultLockTimeout = TimeSpan.FromSeconds(30);
 
     private readonly IDatabase _database;

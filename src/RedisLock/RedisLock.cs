@@ -38,7 +38,7 @@ public class RedisLock : IDisposable
     /// <param name="connection"></param>
     /// <param name="key"></param>
     public RedisLock(ConnectionMultiplexer connection, string key) : this(connection, 0, key, DefaultLockTimeout)
-    {}
+    { }
 
     /// <summary>
     /// 创建分布式锁，但是没有获取
@@ -94,11 +94,16 @@ public class RedisLock : IDisposable
         while (success is false)
         {
             if (stopWatch.Elapsed > timeout)
+            {
+                stopWatch.Stop();
                 throw new AquireRedisLockTimeOutException(this);
+            }
 
             await Task.Delay(Random.Shared.Next(50, 500));
             success = await _database.StringSetAsync(_key, _identity, _timeout, When.NotExists);
         }
+
+        stopWatch.Stop();
     }
 
     public async Task ReleaseAsync()

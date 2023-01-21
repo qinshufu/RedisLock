@@ -26,7 +26,7 @@ local function release_semaphore(sem_name, identity)
 end
 
 local function cmd_wait_semaphore(keys, args)
-    return wait_semaphore(keys[1], args[1], tonumber(args[2]), tonumber(args[3]))
+    return wait_semaphore(keys[1], args[1], tonumber(args[2]), tonumber(args[3]), tonumber(args[4]))
 end
 
 local function cmd_release_semaphore(keys, args)

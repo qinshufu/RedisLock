@@ -19,7 +19,7 @@ public class RedisSemaphore
     private readonly int _size;
 
     public RedisSemaphore(ConnectionMultiplexer connection, string key, int size) : this(connection, 0, key, size, DefaultTimeout)
-    {}
+    { }
 
     public RedisSemaphore(ConnectionMultiplexer connection, int database, string key, int size, TimeSpan timeout)
     {
@@ -62,11 +62,11 @@ public class RedisSemaphore
     private async Task<bool> DoAquireAsync(double score, double scoreOfTimeout)
     {
         var tran = _database.CreateTransaction();
-        #pragma warning disable CS4014
-        tran.SortedSetAddAsync(_key, _identity, score);
+#pragma warning disable CS4014
         tran.SortedSetRemoveRangeByScoreAsync(_key, 0, scoreOfTimeout, Exclude.None); // 删除超时的
-        tran.SortedSetRemoveRangeByRankAsync(_key, 0, -1-_size); // 清理无效的
-        #pragma warning restore CS4014
+        tran.SortedSetRemoveRangeByRankAsync(_key, _size, -1); // 清理无效的
+        tran.SortedSetAddAsync(_key, _identity, score);
+#pragma warning restore CS4014
         var existingTask = tran.SortedSetScoreAsync(_key, _identity);
         await tran.ExecuteAsync();
 

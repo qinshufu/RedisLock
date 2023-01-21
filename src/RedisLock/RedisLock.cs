@@ -4,7 +4,7 @@ using StackExchange.Redis;
 namespace RedisLock;
 
 /// <summary>
-/// Redis 分布式锁
+/// Redis 分布式锁，带有锁超时自动释放的机制
 /// </summary>
 /// <example>
 /// 可以这样使用

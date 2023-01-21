@@ -3,6 +3,9 @@ using StackExchange.Redis;
 
 namespace RedisLock;
 
+/// <summary>
+/// Redis 实现的信号量，带有超时自动释放的机制
+/// </summary>
 public class RedisSemaphore
 {
     private static readonly TimeSpan DefaultAquireTimeout = TimeSpan.FromSeconds(2);

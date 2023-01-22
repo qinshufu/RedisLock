@@ -117,6 +117,19 @@ public class RedisLock : IDisposable
 
     }
 
+    public async Task RefreshAsync()
+    {
+        var tran = _database.CreateTransaction();
+        tran.AddCondition(Condition.StringEqual(_key, _identity));
+#pragma warning disable CS4014
+        tran.StringSetAsync(_key, _identity, _timeout, When.Exists);
+#pragma warning restore CS4014
+        var success = await tran.ExecuteAsync();
+
+        if (success is false)
+            throw new RefreshRedisLockException(this);
+    }
+
     public void Dispose()
     {
         if (_disposed is true)

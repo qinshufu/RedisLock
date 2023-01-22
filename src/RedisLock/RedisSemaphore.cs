@@ -59,6 +59,20 @@ public class RedisSemaphore
             throw new ReleaseRedisLockException(this);
     }
 
+    public async Task RefreshAsync()
+    {
+        var tran = _database.CreateTransaction();
+        #pragma warning disable CS4014
+        tran.SortedSetRemoveRangeByScoreAsync(_key, 0, GetUtcTimestamp() - _timeout.TotalMilliseconds, Exclude.None); // 删除超时的
+        tran.SortedSetRemoveRangeByRankAsync(_key, _size, -1); // 清理无效的
+        #pragma warning restore CS4014
+        tran.AddCondition(Condition.SortedSetContains(_key, _identity));
+        var success = await tran.ExecuteAsync();
+
+        if (success is false)
+            throw new RefreshRedisLockException(this);
+    }
+
     private async Task<bool> DoAquireAsync(double score, double scoreOfTimeout)
     {
         var tran = _database.CreateTransaction();

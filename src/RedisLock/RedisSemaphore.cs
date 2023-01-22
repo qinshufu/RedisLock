@@ -62,10 +62,10 @@ public class RedisSemaphore
     public async Task RefreshAsync()
     {
         var tran = _database.CreateTransaction();
-        #pragma warning disable CS4014
+#pragma warning disable CS4014
         tran.SortedSetRemoveRangeByScoreAsync(_key, 0, GetUtcTimestamp() - _timeout.TotalMilliseconds, Exclude.None); // 删除超时的
         tran.SortedSetRemoveRangeByRankAsync(_key, _size, -1); // 清理无效的
-        #pragma warning restore CS4014
+#pragma warning restore CS4014
         tran.AddCondition(Condition.SortedSetContains(_key, _identity));
         var success = await tran.ExecuteAsync();
 
@@ -77,9 +77,9 @@ public class RedisSemaphore
     {
         var tran = _database.CreateTransaction();
 #pragma warning disable CS4014
+        tran.SortedSetAddAsync(_key, _identity, score); // 生存时间不应该设置的太小，不然可能在通信过程中就已经超时，然后被清理掉
         tran.SortedSetRemoveRangeByScoreAsync(_key, 0, scoreOfTimeout, Exclude.None); // 删除超时的
         tran.SortedSetRemoveRangeByRankAsync(_key, _size, -1); // 清理无效的
-        tran.SortedSetAddAsync(_key, _identity, score);
 #pragma warning restore CS4014
         var existingTask = tran.SortedSetScoreAsync(_key, _identity);
         await tran.ExecuteAsync();

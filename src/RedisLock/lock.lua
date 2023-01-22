@@ -15,9 +15,9 @@ end
 
 local function wait_semaphore(sem_name, identity, utc_timestamp, size, life_time)
     local timeout = utc_timestamp - life_time
+    redis.call('zadd', sem_name, utc_timestamp, identity)
     redis.call('zremrangebyscore', sem_name, 0, timeout)
     redis.call('zremrangebyrank', sem_name, size, -1)
-    redis.call('zadd', sem_name, utc_timestamp, identity)
     return redis.call('zscore', sem_name, identity);
 end
 
